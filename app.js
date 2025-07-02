@@ -1,3 +1,94 @@
+// Configuration: your GitHub repo URL holding the JSON recipes folder
+const RECIPES_API_URL = 'https://api.github.com/repos/StanKwast/koken/contents/recipes';
+
+// Global state
+let allRecipes = [];
+let filteredRecipes = [];
+let activeCategories = new Set();
+let allCategories = [];
+
+const searchInput = document.getElementById('searchInput');
+const categoryFilters = document.getElementById('categoryFilters');
+const recipeList = document.getElementById('recipeList');
+
+async function fetchRecipes() {
+  try {
+    const res = await fetch(RECIPES_API_URL);
+    if (!res.ok) throw new Error('Failed to fetch recipe list');
+    const files = await res.json();
+
+    const jsonFiles = files.filter(file => file.name.endsWith('.json'));
+
+    // Fetch all recipe JSON files in parallel
+    const recipePromises = jsonFiles.map(file => fetch(file.download_url).then(r => r.json()));
+    const recipes = await Promise.all(recipePromises);
+
+    allRecipes = recipes.map(r => ({
+      ...r,
+      category: Array.isArray(r.category) 
+        ? r.category.map(c => c.trim()) 
+        : [r.category ? r.category.trim() : 'Onbekend'],
+    }));
+
+    extractCategories();
+    renderCategoryFilters(); // Render the category filters after extracting categories
+    filterAndRender();
+  } catch (error) {
+    recipeList.textContent = `Fout bij laden recepten: ${error.message}`;
+  }
+}
+
+function extractCategories() {
+  const catSet = new Set();
+  allRecipes.forEach(r => {
+    r.category.forEach(cat => catSet.add(cat.trim()));
+  });
+  allCategories = Array.from(catSet).sort((a, b) => a.localeCompare(b));
+  console.log('Extracted categories:', allCategories);
+}
+
+function renderCategoryFilters() {
+  // Sort categories: active first alphabetically, then inactive alphabetically
+  const active = [];
+  const inactive = [];
+
+  allCategories.forEach(cat => {
+    if (activeCategories.has(cat)) active.push(cat);
+    else inactive.push(cat);
+  });
+
+  const sorted = [...active.sort(), ...inactive.sort()];
+
+  categoryFilters.innerHTML = '';
+
+  sorted.forEach(cat => {
+    const label = document.createElement('span');
+    label.textContent = cat;
+    label.className = 'category-label' + (activeCategories.has(cat) ? ' active' : '');
+    label.onclick = () => {
+      if (activeCategories.has(cat)) activeCategories.delete(cat);
+      else activeCategories.add(cat);
+      renderCategoryFilters();
+      filterAndRender();
+    };
+    categoryFilters.appendChild(label);
+  });
+
+  console.log('Rendered category filters:', categoryFilters.children.length);
+}
+
+function filterAndRender() {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+
+  filteredRecipes = allRecipes.filter(recipe => {
+    const matchesTitle = recipe.title.toLowerCase().includes(searchTerm);
+    const matchesCategory = activeCategories.size === 0 || recipe.category.some(cat => activeCategories.has(cat));
+    return matchesTitle && matchesCategory;
+  });
+
+  renderRecipes();
+}
+
 function renderRecipes() {
   recipeList.innerHTML = '';
 
@@ -6,7 +97,7 @@ function renderRecipes() {
     return;
   }
 
-  filteredRecipes.forEach((recipe) => {
+  filteredRecipes.forEach((recipe, index) => {
     const card = document.createElement('article');
     card.className = 'recipe-card';
     card.setAttribute('tabindex', '0'); // keyboard focusable
@@ -21,18 +112,7 @@ function renderRecipes() {
 
     const catContainer = document.createElement('div');
     catContainer.className = 'recipe-categories';
-
-    // Sort recipe categories: active first alphabetically, then inactive alphabetically
-    const activeCats = recipe.category
-      .filter(cat => activeCategories.has(cat))
-      .sort((a, b) => a.localeCompare(b, 'nl'));
-    const inactiveCats = recipe.category
-      .filter(cat => !activeCategories.has(cat))
-      .sort((a, b) => a.localeCompare(b, 'nl'));
-
-    const sortedCats = [...activeCats, ...inactiveCats];
-
-    sortedCats.forEach(cat => {
+    recipe.category.forEach(cat => {
       const c = document.createElement('span');
       c.className = 'recipe-category';
       c.textContent = cat;
@@ -97,3 +177,9 @@ function renderRecipes() {
     recipeList.appendChild(card);
   });
 }
+
+// Event listeners
+searchInput.addEventListener('input', filterAndRender);
+
+// Initial load
+fetchRecipes();
