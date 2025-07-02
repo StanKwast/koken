@@ -1,22 +1,25 @@
+/* Mobile first: no margin/padding on body, fluid font sizes */
 body {
   font-family: Arial, sans-serif;
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 1rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
   background: #fafafa;
   color: #222;
+  font-size: clamp(1rem, 4vw, 1.1rem);
+  box-sizing: border-box;
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 1rem;
-  font-size: 2rem;
+  margin: 1rem 0;
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
 }
 
 #searchInput {
   width: 100%;
-  font-size: 1.1rem;
-  padding: 0.6rem 0.8rem;
+  font-size: clamp(1rem, 4vw, 1.1rem);
+  padding: 0.5rem 0.8rem;
   border-radius: 5px;
   border: 1px solid #ccc;
   margin-bottom: 1rem;
@@ -37,7 +40,7 @@ h1 {
   border-radius: 15px;
   background: #ddd;
   user-select: none;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 3vw, 0.9rem);
   transition: background-color 0.25s ease;
   border: 1px solid transparent;
 }
@@ -75,7 +78,7 @@ h1 {
 
 .recipe-title {
   font-weight: bold;
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 4vw, 1.25rem);
   margin: 0;
 }
 
@@ -89,14 +92,14 @@ h1 {
   background: #eee;
   border-radius: 12px;
   padding: 0.2rem 0.6rem;
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 3vw, 0.8rem);
   user-select: none;
 }
 
 .recipe-content {
   margin-top: 1rem;
   display: none;
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 3vw, 0.95rem);
   line-height: 1.4;
 }
 
@@ -111,11 +114,12 @@ h1 {
 .recipe-section h3 {
   margin: 0 0 0.3rem 0;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 3vw, 1rem);
   border-bottom: 1px solid #ccc;
   padding-bottom: 0.2rem;
 }
 
+<<<<<<< HEAD
 
 #submitRecipeBtn {
   position: fixed;
@@ -143,4 +147,37 @@ h1 {
   color: #222;
   outline: none;
   cursor: pointer;
+=======
+/* Desktop/laptop layout */
+@media (min-width: 701px) {
+  body {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  #searchInput {
+    font-size: 1.1rem;
+    padding: 0.6rem 0.8rem;
+  }
+  .category-label {
+    font-size: 0.9rem;
+  }
+  .recipe-title {
+    font-size: 1.25rem;
+  }
+  .recipe-category {
+    font-size: 0.8rem;
+  }
+  .recipe-content {
+    font-size: 0.95rem;
+  }
+  .recipe-section h3 {
+    font-size: 1rem;
+  }
+>>>>>>> a656a769b1ddef94e1684aacba39ceb6fb918366
 }

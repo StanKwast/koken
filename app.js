@@ -1,3 +1,5 @@
+console.log('app.js loaded');
+
 // Configuration: your GitHub repo URL holding the JSON recipes folder
 const RECIPES_API_URL = 'https://api.github.com/repos/StanKwast/koken/contents/recipes';
 
@@ -25,10 +27,13 @@ async function fetchRecipes() {
 
     allRecipes = recipes.map(r => ({
       ...r,
-      category: Array.isArray(r.category) ? r.category : [r.category || 'Onbekend'],
+      category: Array.isArray(r.category) 
+        ? r.category.map(c => c.trim()) 
+        : [r.category ? r.category.trim() : 'Onbekend'],
     }));
 
     extractCategories();
+    renderCategoryFilters(); // Render the category filters after extracting categories
     filterAndRender();
   } catch (error) {
     recipeList.textContent = `Fout bij laden recepten: ${error.message}`;
@@ -41,6 +46,7 @@ function extractCategories() {
     r.category.forEach(cat => catSet.add(cat.trim()));
   });
   allCategories = Array.from(catSet).sort((a, b) => a.localeCompare(b));
+  console.log('Extracted categories:', allCategories);
 }
 
 function renderCategoryFilters() {
@@ -69,6 +75,8 @@ function renderCategoryFilters() {
     };
     categoryFilters.appendChild(label);
   });
+
+  console.log('Rendered category filters:', categoryFilters.children.length);
 }
 
 function filterAndRender() {
