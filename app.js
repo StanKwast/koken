@@ -1,3 +1,5 @@
+console.log('app.js loaded');
+
 // Configuration: your GitHub repo URL holding the JSON recipes folder
 const RECIPES_API_URL = 'https://api.github.com/repos/StanKwast/koken/contents/recipes';
 
