@@ -119,11 +119,10 @@ h1 {
   padding-bottom: 0.2rem;
 }
 
-
 #submitRecipeBtn {
   position: fixed;
   top: 10px;
-  right: 10px;
+  left: 10px;         /* changed from right: 10px */
   background-color: rgba(128, 128, 128, 0.15);
   color: #555;
   font-size: 1.8rem;
@@ -146,6 +145,8 @@ h1 {
   color: #222;
   outline: none;
   cursor: pointer;
+}
+
 /* Desktop/laptop layout */
 
 @media (min-width: 701px) {
