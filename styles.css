@@ -119,13 +119,13 @@ h1 {
   padding-bottom: 0.2rem;
 }
 
-/* Restore original styles for laptops/desktops */
-@media (min-width: 601px) {
+/* Desktop/laptop layout */
+@media (min-width: 701px) {
   body {
-    max-width: 600px;
+    max-width: 700px;
     margin: 2rem auto;
     padding: 1rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
   h1 {
     font-size: 2rem;
