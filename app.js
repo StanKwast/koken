@@ -150,13 +150,10 @@ function renderRecipes() {
     instructionsTitle.textContent = 'Instructies';
     instructionsSection.appendChild(instructionsTitle);
 
-    const instructionsList = document.createElement('ol');
-    recipe.instructions.forEach(inst => {
-      const li = document.createElement('li');
-      li.textContent = inst;
-      instructionsList.appendChild(li);
-    });
-    instructionsSection.appendChild(instructionsList);
+    const instructionsText = document.createElement('div');
+    instructionsText.className = 'recipe-instructions-text';
+    instructionsText.textContent = recipe.instructions.join('\n');
+    instructionsSection.appendChild(instructionsText);
 
     content.appendChild(ingredientsSection);
     content.appendChild(instructionsSection);
