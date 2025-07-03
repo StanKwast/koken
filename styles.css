@@ -85,7 +85,8 @@ h1 {
 .recipe-categories {
   display: flex;
   gap: 0.4rem;
-  flex-wrap: wrap;}
+  flex-wrap: wrap;
+  margin-top: 0.3rem;}
 
 .recipe-category {
   display: block;
