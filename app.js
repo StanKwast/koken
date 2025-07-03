@@ -82,12 +82,25 @@ function renderCategoryFilters() {
 function filterAndRender() {
   const searchTerm = searchInput.value.trim().toLowerCase();
 
-  filteredRecipes = allRecipes.filter(recipe => {
+  // Filter recipes that match title or ingredients and category
+  let matches = allRecipes.filter(recipe => {
     const matchesTitle = recipe.title.toLowerCase().includes(searchTerm);
-    const matchesCategory = activeCategories.size === 0 || recipe.category.some(cat => activeCategories.has(cat));
-    return matchesTitle && matchesCategory;
+    const matchesIngredient = recipe.ingredients.some(ing => ing.toLowerCase().includes(searchTerm));
+    const matchesCategory =
+      activeCategories.size === 0 ||
+      recipe.category.some(cat => activeCategories.has(cat));
+    return (matchesTitle || matchesIngredient) && matchesCategory;
   });
 
+  // Sort: recipes with title match first, then ingredient match
+  matches.sort((a, b) => {
+    const aTitle = a.title.toLowerCase().includes(searchTerm);
+    const bTitle = b.title.toLowerCase().includes(searchTerm);
+    if (aTitle === bTitle) return 0;
+    return aTitle ? -1 : 1;
+  });
+
+  filteredRecipes = matches;
   renderRecipes();
 }
 
