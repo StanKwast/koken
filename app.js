@@ -122,7 +122,6 @@ function renderRecipes() {
     });
 
     header.appendChild(title);
-    header.appendChild(document.createElement('br'));
     header.appendChild(catContainer);
 
     // Content collapsible
