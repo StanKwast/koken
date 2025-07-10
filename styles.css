@@ -4,8 +4,8 @@ body {
   max-width: 100%;
   margin: 0;
   padding: 0;
-  background: #fafafa;
-  color: #222;
+  background: #feecc2;
+  color: #5a3a1b; 
   font-size: clamp(1rem, 4vw, 1.1rem);
   box-sizing: border-box;
 }
@@ -22,9 +22,10 @@ h1 {
   font-size: clamp(1rem, 4vw, 1.1rem);
   padding: 0.5rem 0.8rem;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #e1a948; 
   margin-bottom: 1rem;
   box-sizing: border-box;
+  background: #fff;
 }
 
 #categoryFilters {
@@ -39,7 +40,8 @@ h1 {
   cursor: pointer;
   padding: 0.3rem 0.7rem;
   border-radius: 15px;
-  background: #ddd;
+  background: #d8992c; 
+  color: #ffffff;
   user-select: none;
   font-size: clamp(0.8rem, 3vw, 0.9rem);
   transition: background-color 0.25s ease;
@@ -47,9 +49,9 @@ h1 {
 }
 
 .category-label.active {
-  background: #4caf50;
-  color: white;
-  border-color: #388e3c;
+  background: #c75c1a; 
+  color: #fff;
+  border-color: #a34713;
 }
 
 #recipeList {
@@ -59,9 +61,10 @@ h1 {
 }
 
 .recipe-card {
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(199, 92, 26, 0.07);
+  border: 1px solid #e1a948;
   padding: 1rem;
   cursor: pointer;
   transition: box-shadow 0.3s ease;
@@ -81,6 +84,7 @@ h1 {
   font-weight: bold;
   font-size: clamp(1rem, 4vw, 1.25rem);
   margin: 0;
+  color: #9e4812; 
 }
 
 .recipe-categories {
@@ -91,7 +95,8 @@ h1 {
 
 .recipe-category {
   display: block;
-  background: #eee;
+  background: #d69627;
+  color: #fff; 
   border-radius: 12px;
   padding: 0.2rem 0.6rem;
   font-size: clamp(0.7rem, 3vw, 0.8rem);
@@ -129,27 +134,26 @@ h1 {
   position: fixed;
   bottom: 10px;
   right: 10px;         
-  background-color: #fafafa;
-  color: #ebebeb;
-  font-size: 1.8rem;
+  background-color: #f3e5c0;
+  color: #ddc788;
+  border-radius: 20px;
+  font-size: 0.6rem;
   font-weight: bold;
   text-decoration: none;
+  text-align: center;
   width: 100px;
   height: 32px;
   line-height: 32px;
-  border-radius: 4px;
-  text-align: center;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(199,92,26,0.15);
   transition: background-color 0.3s ease, color 0.3s ease;
   user-select: none;
   z-index: 1000;
-  font-size: 0.5rem;
 }
 
 #submitRecipeBtn:hover,
 #submitRecipeBtn:focus {
-  background-color: rgba(128, 128, 128, 0.4);
-  color: #222;
+  background-color: #a34713;
+  color: #fff;
   outline: none;
   cursor: pointer;
 }
@@ -159,8 +163,8 @@ h1 {
 @media (min-width: 701px) {
   body {
     max-width: 700px;
-    margin: 2rem auto;
-    padding: 1rem;
+    margin: 0rem auto;
+    padding: 0.5rem;
     font-size: 1.1rem;
   }
   h1 {
