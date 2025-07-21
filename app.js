@@ -119,7 +119,8 @@ function renderRecipes() {
 
     const catContainer = document.createElement('div');
     catContainer.className = 'recipe-categories';
-    recipe.category.forEach(cat => {
+    // Order the categories alphabetically for each recipe card
+    [...recipe.category].sort((a, b) => a.localeCompare(b)).forEach(cat => {
       const c = document.createElement('span');
       c.className = 'recipe-category';
       c.textContent = cat;
