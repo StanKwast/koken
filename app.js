@@ -50,16 +50,8 @@ function extractCategories() {
 }
 
 function renderCategoryFilters() {
-  // Sort categories: active first alphabetically, then inactive alphabetically
-  const active = [];
-  const inactive = [];
-
-  allCategories.forEach(cat => {
-    if (activeCategories.has(cat)) active.push(cat);
-    else inactive.push(cat);
-  });
-
-  const sorted = [...active.sort(), ...inactive.sort()];
+  // Sort categories alphabetically only
+  const sorted = [...allCategories].sort((a, b) => a.localeCompare(b));
 
   categoryFilters.innerHTML = '';
 
