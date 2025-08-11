@@ -68,6 +68,7 @@ h1 {
   padding: 1rem;
   cursor: pointer;
   transition: box-shadow 0.3s ease;
+  position: relative; /* Needed for absolute pin positioning */
 }
 
 .recipe-card:hover {
@@ -156,6 +157,72 @@ h1 {
   color: #fff;
   outline: none;
   cursor: pointer;
+}
+
+.pin-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #c75c1a;
+  z-index: 2;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.pin-btn:hover,
+.pin-btn:focus {
+  color: #a34713;
+}
+
+/* Pinned recipes section */
+#pinnedRecipesContainer {
+  display: none;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 701px) {
+  #pinnedRecipesContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2rem;
+  }
+  #pinnedRecipesContainer .recipe-card {
+    max-width: 600px;
+    min-width: 0;
+    box-shadow: 0 0 12px rgba(199, 92, 26, 0.10);
+    border: 1.5px solid #e1a948;
+    width: 100%;
+  }
+
+  body {
+    max-width: 700px;
+    margin: 0rem auto;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  /* Make pinned container twice as wide as the main content */
+  #pinnedRecipesContainer {
+    max-width: 1400px; /* 2x the body max-width */
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+  #pinnedRecipesContainer .recipe-card {
+    max-width: 600px; /* nearly double the normal card */
+    min-width: 0;
+    flex: 1 1 0;
+  }
 }
 
 /* Desktop/laptop layout */

@@ -8,6 +8,7 @@ let allRecipes = [];
 let filteredRecipes = [];
 let activeCategories = new Set();
 let allCategories = [];
+let pinnedRecipes = new Set();
 
 const searchInput = document.getElementById('searchInput');
 const categoryFilters = document.getElementById('categoryFilters');
@@ -84,8 +85,11 @@ function filterAndRender() {
     return (matchesTitle || matchesIngredient) && matchesCategory;
   });
 
-  // Sort: recipes with title match first, then ingredient match
+  // Sort: pinned first, then title match, then ingredient match
   matches.sort((a, b) => {
+    const aPinned = pinnedRecipes.has(a.title);
+    const bPinned = pinnedRecipes.has(b.title);
+    if (aPinned !== bPinned) return aPinned ? -1 : 1;
     const aTitle = a.title.toLowerCase().includes(searchTerm);
     const bTitle = b.title.toLowerCase().includes(searchTerm);
     if (aTitle === bTitle) return 0;
@@ -93,21 +97,62 @@ function filterAndRender() {
   });
 
   filteredRecipes = matches;
-  renderRecipes();
+
+  renderPinnedRecipes();
+
+  let toShow = filteredRecipes;
+
+  const pinned = allRecipes.filter(r => pinnedRecipes.has(r.title));
+  const isDesktop = window.innerWidth > 700;
+
+  if (isDesktop && pinned.length >= 2) {
+    // If even, exclude all pinned from main list
+    // If odd, exclude all but the last pinned from main list, show last pinned first
+    const pairCount = pinned.length % 2 === 0 ? pinned.length : pinned.length - 1;
+    const pinnedToShow = pinned.slice(0, pairCount).map(r => r.title);
+    const lonePinned = pinned.length % 2 === 1 ? pinned[pinned.length - 1] : null;
+
+    toShow = filteredRecipes.filter(r => !pinnedToShow.includes(r.title));
+    // If there is a lone pinned, put it at the start of the list
+    if (lonePinned) {
+      toShow = [lonePinned, ...toShow.filter(r => r.title !== lonePinned.title)];
+    }
+  }
+
+  renderRecipes(toShow);
 }
 
-function renderRecipes() {
+function renderRecipes(recipesToRender) {
   recipeList.innerHTML = '';
 
-  if (filteredRecipes.length === 0) {
+  if (recipesToRender.length === 0) {
     recipeList.textContent = 'Geen recepten gevonden.';
     return;
   }
 
-  filteredRecipes.forEach((recipe, index) => {
+  recipesToRender.forEach((recipe, index) => {
     const card = document.createElement('article');
     card.className = 'recipe-card';
     card.setAttribute('tabindex', '0'); // keyboard focusable
+
+    // Pin button
+    const pinBtn = document.createElement('button');
+    pinBtn.className = 'pin-btn';
+    pinBtn.title = pinnedRecipes.has(recipe.title) ? 'Losmaken' : 'Vastmaken';
+    const isPinned = pinnedRecipes.has(recipe.title);
+    pinBtn.innerHTML = isPinned
+      ? `<svg width="20" height="20" viewBox="0 0 20 20" fill="#c75c1a" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C4.44772 3 4 3.44772 4 4V17.382C4 17.9367 4.68437 18.2346 5.10557 17.8944L10 14.118L14.8944 17.8944C15.3156 18.2346 16 17.9367 16 17.382V4C16 3.44772 15.5523 3 15 3H5Z"/></svg>`
+      : `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#c75c1a" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C4.44772 3 4 3.44772 4 4V17.382C4 17.9367 4.68437 18.2346 5.10557 17.8944L10 14.118L14.8944 17.8944C15.3156 18.2346 16 17.9367 16 17.382V4C16 3.44772 15.5523 3 15 3H5Z"/></svg>`;
+    pinBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (pinnedRecipes.has(recipe.title)) {
+        pinnedRecipes.delete(recipe.title);
+      } else {
+        pinnedRecipes.add(recipe.title);
+      }
+      filterAndRender();
+    };
+    card.appendChild(pinBtn);
 
     // Header with title and categories
     const header = document.createElement('div');
@@ -168,19 +213,169 @@ function renderRecipes() {
     card.appendChild(content);
 
     // Toggle on click or enter/space keyboard
-    card.addEventListener('click', () => {
-      content.classList.toggle('open');
+    card.addEventListener('click', (e) => {
+      // If in pinned container and has data-pair, toggle both in the pair
+      if (card.parentElement && card.parentElement.id === 'pinnedRecipesContainer' && card.dataset.pair !== undefined) {
+        const pairIndex = card.dataset.pair;
+        const allInPair = Array.from(card.parentElement.querySelectorAll(`[data-pair="${pairIndex}"]`));
+        const shouldOpen = !allInPair[0].querySelector('.recipe-content').classList.contains('open');
+        allInPair.forEach(c => c.querySelector('.recipe-content').classList.toggle('open', shouldOpen));
+      } else {
+        content.classList.toggle('open');
+      }
     });
 
     card.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        content.classList.toggle('open');
+        // Same logic as above
+        if (card.parentElement && card.parentElement.id === 'pinnedRecipesContainer' && card.dataset.pair !== undefined) {
+          const pairIndex = card.dataset.pair;
+          const allInPair = Array.from(card.parentElement.querySelectorAll(`[data-pair="${pairIndex}"]`));
+          const shouldOpen = !allInPair[0].querySelector('.recipe-content').classList.contains('open');
+          allInPair.forEach(c => c.querySelector('.recipe-content').classList.toggle('open', shouldOpen));
+        } else {
+          content.classList.toggle('open');
+        }
       }
     });
 
     recipeList.appendChild(card);
   });
+}
+
+function renderPinnedRecipes() {
+  const container = document.getElementById('pinnedRecipesContainer');
+  const pinned = allRecipes.filter(r => pinnedRecipes.has(r.title));
+  const isDesktop = window.innerWidth > 700;
+
+  if (isDesktop && pinned.length >= 2) {
+    const pairCount = pinned.length % 2 === 0 ? pinned.length : pinned.length - 1;
+    container.innerHTML = '';
+    for (let i = 0; i < pairCount; i++) {
+      const card = renderRecipeCard(pinned[i]);
+      card.dataset.pair = Math.floor(i / 2); // Assign pair index
+      container.appendChild(card);
+    }
+    container.style.display = '';
+  } else {
+    container.innerHTML = '';
+    container.style.display = 'none';
+  }
+}
+
+// Example card rendering function (use this for both pinned and normal cards)
+function renderRecipeCard(recipe) {
+  const card = document.createElement('article');
+  card.className = 'recipe-card';
+  card.setAttribute('tabindex', '0');
+
+  // Pin button
+  const pinBtn = document.createElement('button');
+  pinBtn.className = 'pin-btn';
+  pinBtn.title = pinnedRecipes.has(recipe.title) ? 'Losmaken' : 'Vastmaken';
+  const isPinned = pinnedRecipes.has(recipe.title);
+  pinBtn.innerHTML = isPinned
+    ? `<svg width="20" height="20" viewBox="0 0 20 20" fill="#c75c1a" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C4.44772 3 4 3.44772 4 4V17.382C4 17.9367 4.68437 18.2346 5.10557 17.8944L10 14.118L14.8944 17.8944C15.3156 18.2346 16 17.9367 16 17.382V4C16 3.44772 15.5523 3 15 3H5Z"/></svg>`
+    : `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#c75c1a" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C4.44772 3 4 3.44772 4 4V17.382C4 17.9367 4.68437 18.2346 5.10557 17.8944L10 14.118L14.8944 17.8944C15.3156 18.2346 16 17.9367 16 17.382V4C16 3.44772 15.5523 3 15 3H5Z"/></svg>`;
+  pinBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (pinnedRecipes.has(recipe.title)) {
+      pinnedRecipes.delete(recipe.title);
+    } else {
+      pinnedRecipes.add(recipe.title);
+    }
+    filterAndRender();
+  };
+  card.appendChild(pinBtn);
+
+  // Header with title and categories
+  const header = document.createElement('div');
+  header.className = 'recipe-header';
+
+  const title = document.createElement('h2');
+  title.className = 'recipe-title';
+  title.textContent = recipe.title;
+
+  const catContainer = document.createElement('div');
+  catContainer.className = 'recipe-categories';
+  // Order the categories alphabetically for each recipe card
+  [...recipe.category].sort((a, b) => a.localeCompare(b)).forEach(cat => {
+    const c = document.createElement('span');
+    c.className = 'recipe-category';
+    c.textContent = cat;
+    catContainer.appendChild(c);
+  });
+
+  header.appendChild(title);
+  header.appendChild(catContainer);
+
+  // Content collapsible
+  const content = document.createElement('div');
+  content.className = 'recipe-content';
+
+  // Ingredients section
+  const ingredientsSection = document.createElement('section');
+  ingredientsSection.className = 'recipe-section';
+  const ingredientsTitle = document.createElement('h3');
+  ingredientsTitle.textContent = 'Ingrediënten';
+  ingredientsSection.appendChild(ingredientsTitle);
+
+  const ingredientsList = document.createElement('ul');
+  recipe.ingredients.forEach(ing => {
+    const li = document.createElement('li');
+    li.textContent = ing;
+    ingredientsList.appendChild(li);
+  });
+  ingredientsSection.appendChild(ingredientsList);
+
+  // Instructions section
+  const instructionsSection = document.createElement('section');
+  instructionsSection.className = 'recipe-section';
+  const instructionsTitle = document.createElement('h3');
+  instructionsTitle.textContent = 'Instructies';
+  instructionsSection.appendChild(instructionsTitle);
+
+  const instructionsText = document.createElement('div');
+  instructionsText.className = 'recipe-instructions-text';
+  instructionsText.textContent = recipe.instructions.join('\n');
+  instructionsSection.appendChild(instructionsText);
+
+  content.appendChild(ingredientsSection);
+  content.appendChild(instructionsSection);
+
+  card.appendChild(header);
+  card.appendChild(content);
+
+  // Toggle on click or enter/space keyboard
+  card.addEventListener('click', (e) => {
+    // If in pinned container and has data-pair, toggle both in the pair
+    if (card.parentElement && card.parentElement.id === 'pinnedRecipesContainer' && card.dataset.pair !== undefined) {
+      const pairIndex = card.dataset.pair;
+      const allInPair = Array.from(card.parentElement.querySelectorAll(`[data-pair="${pairIndex}"]`));
+      const shouldOpen = !allInPair[0].querySelector('.recipe-content').classList.contains('open');
+      allInPair.forEach(c => c.querySelector('.recipe-content').classList.toggle('open', shouldOpen));
+    } else {
+      content.classList.toggle('open');
+    }
+  });
+
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      // Same logic as above
+      if (card.parentElement && card.parentElement.id === 'pinnedRecipesContainer' && card.dataset.pair !== undefined) {
+        const pairIndex = card.dataset.pair;
+        const allInPair = Array.from(card.parentElement.querySelectorAll(`[data-pair="${pairIndex}"]`));
+        const shouldOpen = !allInPair[0].querySelector('.recipe-content').classList.contains('open');
+        allInPair.forEach(c => c.querySelector('.recipe-content').classList.toggle('open', shouldOpen));
+      } else {
+        content.classList.toggle('open');
+      }
+    }
+  });
+
+  return card;
 }
 
 // Event listeners
