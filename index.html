@@ -11,16 +11,18 @@
 <main>
     <img src="logo.png" alt="Logo" style="display:block;margin:0rem auto 0rem auto;max-width:200px;" />
 
-    <input
-      type="search"
-      id="searchInput"
-      placeholder="Zoek recepten op titel of ingrediënt..."
-      aria-label="Zoek recepten op titel of ingrediënt"
-    />
+
+    <div class="searchbar-row">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Zoek op titel of ingrediënt"
+        aria-label="Zoek op titel of ingrediënt"
+      />
+      <button id="shuffleRecipesBtn" type="button">Shuffle</button>
+    </div>
 
     <section id="categoryFilters" aria-label="Categorie filters"></section>
-
-    <button id="shuffleRecipesBtn" type="button">🔀 Shuffle recepten</button>
 
     <div id="pinnedRecipesContainer"></div>
     <section id="recipeList" aria-live="polite"></section>

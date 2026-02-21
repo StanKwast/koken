@@ -1,7 +1,47 @@
+/* Search bar row with shuffle button */
+.searchbar-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+
+.searchbar-row #searchInput {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.searchbar-row #shuffleRecipesBtn {
+  margin-left: 0.5rem;
+  height: 2.5rem;
+  padding: 0 0.5rem;
+  font-size: 1rem;
+  background: #e1a948;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(199,92,26,0.10);
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.searchbar-row #shuffleRecipesBtn:hover,
+.searchbar-row #shuffleRecipesBtn:focus {
+  background: #c75c1a;
+  color: #fff;
+  outline: none;
+}
 /* Shuffle button styling */
 #shuffleRecipesBtn {
   display: block;
-  margin: 0.5rem auto 1.5rem auto;
+  margin: 0.5rem auto 0.5rem auto;
   padding: 0.5rem 1.2rem;
   font-size: 1rem;
   background: #e1a948;
@@ -52,15 +92,15 @@ h1 {
 #categoryFilters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.3rem;
   margin-bottom: 1.5rem;
   justify-content: center;
 }
 
 .category-label {
   cursor: pointer;
-  padding: 0.3rem 0.7rem;
-  border-radius: 15px;
+  padding: 0.3rem 0.4rem;
+  border-radius: 14px;
   background: #d8992c; 
   color: #ffffff;
   user-select: none;
@@ -210,15 +250,15 @@ h1 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
-    padding: 2rem 1rem;
+    padding: 0 1rem;
     max-width: 1400px;
-    width: 100vw;
-    margin-left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 2rem;
+    width: calc(100vw - 2rem);
+    margin: 0 auto 2rem auto;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
   #pinnedRecipesContainer .recipe-card {
-    max-width: 600px;
+    max-width: 6  00px;
     min-width: 0;
     box-shadow: 0 0 12px rgba(199, 92, 26, 0.10);
     border: 1.5px solid #e1a948;
@@ -240,9 +280,11 @@ h1 {
     transform: translateX(-50%);
   }
   #pinnedRecipesContainer .recipe-card {
-    max-width: 600px; /* nearly double the normal card */
+    max-width: clamp(240px, 48vw, 600px);
     min-width: 0;
     flex: 1 1 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
