@@ -10,6 +10,20 @@ let activeCategories = new Set();
 let allCategories = [];
 let pinnedRecipes = new Set();
 
+// Shuffle utility (Fisher-Yates)
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function shuffleRecipes() {
+  shuffleArray(filteredRecipes);
+  renderPinnedRecipes();
+  renderRecipes(filteredRecipes);
+}
+
 const searchInput = document.getElementById('searchInput');
 const categoryFilters = document.getElementById('categoryFilters');
 const recipeList = document.getElementById('recipeList');
@@ -383,3 +397,9 @@ searchInput.addEventListener('input', filterAndRender);
 
 // Initial load
 fetchRecipes();
+
+// Shuffle button event listener
+const shuffleBtn = document.getElementById('shuffleRecipesBtn');
+if (shuffleBtn) {
+  shuffleBtn.addEventListener('click', shuffleRecipes);
+}
