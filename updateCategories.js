@@ -16,6 +16,7 @@ fs.readdirSync(recipesDir).forEach(file => {
       const filtered = data.category.filter(cat => !toRemove.includes(cat));
       if (filtered.length !== data.category.length) changed = true;
 
+      // Add "Kleine gerechten" if needed
       if (!filtered.includes(toAdd) && data.category.some(cat => toRemove.includes(cat))) {
         filtered.push(toAdd);
         changed = true;
