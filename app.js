@@ -9,6 +9,7 @@ let filteredRecipes = [];
 let activeCategories = new Set();
 let allCategories = [];
 let pinnedRecipes = new Set();
+let pinnedRecipeOrder = [];
 
 // Shuffle utility (Fisher-Yates)
 function shuffleArray(array) {
@@ -22,6 +23,28 @@ function shuffleRecipes() {
   shuffleArray(filteredRecipes);
   renderPinnedRecipes();
   renderRecipes(filteredRecipes);
+}
+
+function togglePinnedRecipe(title) {
+  if (pinnedRecipes.has(title)) {
+    pinnedRecipes.delete(title);
+    pinnedRecipeOrder = pinnedRecipeOrder.filter(item => item !== title);
+  } else {
+    pinnedRecipes.add(title);
+    pinnedRecipeOrder = [title, ...pinnedRecipeOrder.filter(item => item !== title)];
+  }
+}
+
+function getPinnedRecipesInOrder() {
+  const orderedPinned = pinnedRecipeOrder
+    .map(title => allRecipes.find(recipe => recipe.title === title))
+    .filter(Boolean);
+
+  const remainingPinned = allRecipes.filter(recipe =>
+    pinnedRecipes.has(recipe.title) && !pinnedRecipeOrder.includes(recipe.title)
+  );
+
+  return [...orderedPinned, ...remainingPinned];
 }
 
 function formatRecipeDate(timestamp) {
@@ -123,18 +146,17 @@ function filterAndRender() {
 
   let toShow = filteredRecipes;
 
-  const pinned = allRecipes.filter(r => pinnedRecipes.has(r.title));
+  const pinned = getPinnedRecipesInOrder();
   const isDesktop = window.innerWidth > 700;
 
-  if (isDesktop && pinned.length >= 2) {
-    // If even, exclude all pinned from main list
-    // If odd, exclude all but the last pinned from main list, show last pinned first
+  if (isDesktop && pinned.length > 0) {
+    // If even, exclude all pinned from main list.
+    // If odd, exclude all but the last pinned from main list and show that lone item first.
     const pairCount = pinned.length % 2 === 0 ? pinned.length : pinned.length - 1;
     const pinnedToShow = pinned.slice(0, pairCount).map(r => r.title);
     const lonePinned = pinned.length % 2 === 1 ? pinned[pinned.length - 1] : null;
 
     toShow = filteredRecipes.filter(r => !pinnedToShow.includes(r.title));
-    // If there is a lone pinned, put it at the start of the list
     if (lonePinned) {
       toShow = [lonePinned, ...toShow.filter(r => r.title !== lonePinned.title)];
     }
@@ -166,11 +188,7 @@ function renderRecipes(recipesToRender) {
       : `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#c75c1a" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C4.44772 3 4 3.44772 4 4V17.382C4 17.9367 4.68437 18.2346 5.10557 17.8944L10 14.118L14.8944 17.8944C15.3156 18.2346 16 17.9367 16 17.382V4C16 3.44772 15.5523 3 15 3H5Z"/></svg>`;
     pinBtn.onclick = (e) => {
       e.stopPropagation();
-      if (pinnedRecipes.has(recipe.title)) {
-        pinnedRecipes.delete(recipe.title);
-      } else {
-        pinnedRecipes.add(recipe.title);
-      }
+      togglePinnedRecipe(recipe.title);
       filterAndRender();
     };
     card.appendChild(pinBtn);
@@ -278,10 +296,10 @@ function renderRecipes(recipesToRender) {
 
 function renderPinnedRecipes() {
   const container = document.getElementById('pinnedRecipesContainer');
-  const pinned = allRecipes.filter(r => pinnedRecipes.has(r.title));
+  const pinned = getPinnedRecipesInOrder();
   const isDesktop = window.innerWidth > 700;
 
-  if (isDesktop && pinned.length >= 2) {
+  if (isDesktop && pinned.length > 0) {
     const pairCount = pinned.length % 2 === 0 ? pinned.length : pinned.length - 1;
     container.innerHTML = '';
     for (let i = 0; i < pairCount; i++) {
@@ -312,11 +330,7 @@ function renderRecipeCard(recipe) {
     : `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#c75c1a" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M5 3C4.44772 3 4 3.44772 4 4V17.382C4 17.9367 4.68437 18.2346 5.10557 17.8944L10 14.118L14.8944 17.8944C15.3156 18.2346 16 17.9367 16 17.382V4C16 3.44772 15.5523 3 15 3H5Z"/></svg>`;
   pinBtn.onclick = (e) => {
     e.stopPropagation();
-    if (pinnedRecipes.has(recipe.title)) {
-      pinnedRecipes.delete(recipe.title);
-    } else {
-      pinnedRecipes.add(recipe.title);
-    }
+    togglePinnedRecipe(recipe.title);
     filterAndRender();
   };
   card.appendChild(pinBtn);
