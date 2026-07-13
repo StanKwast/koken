@@ -149,12 +149,11 @@ function filterAndRender() {
   const pinned = getPinnedRecipesInOrder();
   const isDesktop = window.innerWidth > 700;
 
-  if (isDesktop && pinned.length > 0) {
-    // If even, exclude all pinned from main list.
-    // If odd, exclude all but the last pinned from main list and show that lone item first.
-    const pairCount = pinned.length % 2 === 0 ? pinned.length : pinned.length - 1;
-    const pinnedToShow = pinned.slice(0, pairCount).map(r => r.title);
-    const lonePinned = pinned.length % 2 === 1 ? pinned[pinned.length - 1] : null;
+  if (pinned.length > 0) {
+    const pinnedCount = isDesktop ? pinned.length : pinned.length;
+    const pairCount = isDesktop && pinned.length % 2 === 0 ? pinned.length : pinned.length;
+    const pinnedToShow = pinned.slice(0, pinnedCount).map(r => r.title);
+    const lonePinned = isDesktop && pinned.length % 2 === 1 ? pinned[pinned.length - 1] : null;
 
     toShow = filteredRecipes.filter(r => !pinnedToShow.includes(r.title));
     if (lonePinned) {
@@ -299,12 +298,14 @@ function renderPinnedRecipes() {
   const pinned = getPinnedRecipesInOrder();
   const isDesktop = window.innerWidth > 700;
 
-  if (isDesktop && pinned.length > 0) {
-    const pairCount = pinned.length % 2 === 0 ? pinned.length : pinned.length - 1;
+  if (pinned.length > 0) {
+    const pairCount = isDesktop && pinned.length % 2 === 0 ? pinned.length : pinned.length;
     container.innerHTML = '';
     for (let i = 0; i < pairCount; i++) {
       const card = renderRecipeCard(pinned[i]);
-      card.dataset.pair = Math.floor(i / 2); // Assign pair index
+      if (isDesktop) {
+        card.dataset.pair = Math.floor(i / 2);
+      }
       container.appendChild(card);
     }
     container.style.display = '';
