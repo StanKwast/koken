@@ -24,6 +24,13 @@ function shuffleRecipes() {
   renderRecipes(filteredRecipes);
 }
 
+function formatRecipeDate(timestamp) {
+  if (!timestamp) return '';
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 const searchInput = document.getElementById('searchInput');
 const categoryFilters = document.getElementById('categoryFilters');
 const recipeList = document.getElementById('recipeList');
@@ -45,9 +52,13 @@ async function fetchRecipes() {
       category: Array.isArray(r.category) 
         ? r.category.map(c => c.trim()) 
         : [r.category ? r.category.trim() : 'Onbekend'],
+      timestamp: r.timestamp || null,
+      timestampMs: r.timestamp ? Date.parse(r.timestamp) : 0,
     }));
 
     extractCategories();
+    // Keep newest recipes first by default
+    allRecipes.sort((a, b) => (b.timestampMs || 0) - (a.timestampMs || 0));
     renderCategoryFilters(); // Render the category filters after extracting categories
     filterAndRender();
   } catch (error) {
@@ -99,15 +110,11 @@ function filterAndRender() {
     return (matchesTitle || matchesIngredient) && matchesCategory;
   });
 
-  // Sort: pinned first, then title match, then ingredient match
+  // Sort newest recipes first, then by title
   matches.sort((a, b) => {
-    const aPinned = pinnedRecipes.has(a.title);
-    const bPinned = pinnedRecipes.has(b.title);
-    if (aPinned !== bPinned) return aPinned ? -1 : 1;
-    const aTitle = a.title.toLowerCase().includes(searchTerm);
-    const bTitle = b.title.toLowerCase().includes(searchTerm);
-    if (aTitle === bTitle) return 0;
-    return aTitle ? -1 : 1;
+    const timeDiff = (b.timestampMs || 0) - (a.timestampMs || 0);
+    if (timeDiff !== 0) return timeDiff;
+    return a.title.localeCompare(b.title);
   });
 
   filteredRecipes = matches;
@@ -176,6 +183,9 @@ function renderRecipes(recipesToRender) {
     title.className = 'recipe-title';
     title.textContent = recipe.title;
 
+    const metaRow = document.createElement('div');
+    metaRow.className = 'recipe-meta-row';
+
     const catContainer = document.createElement('div');
     catContainer.className = 'recipe-categories';
     // Order the categories alphabetically for each recipe card
@@ -186,8 +196,16 @@ function renderRecipes(recipesToRender) {
       catContainer.appendChild(c);
     });
 
+    const dateLabelText = formatRecipeDate(recipe.timestamp);
+    const dateLabel = document.createElement('div');
+    dateLabel.className = 'recipe-meta';
+    dateLabel.textContent = dateLabelText;
+
+    metaRow.appendChild(catContainer);
+    if (dateLabelText) metaRow.appendChild(dateLabel);
+
     header.appendChild(title);
-    header.appendChild(catContainer);
+    header.appendChild(metaRow);
 
     // Content collapsible
     const content = document.createElement('div');
@@ -311,6 +329,11 @@ function renderRecipeCard(recipe) {
   title.className = 'recipe-title';
   title.textContent = recipe.title;
 
+  header.appendChild(title);
+
+  const metaRow = document.createElement('div');
+  metaRow.className = 'recipe-meta-row';
+
   const catContainer = document.createElement('div');
   catContainer.className = 'recipe-categories';
   // Order the categories alphabetically for each recipe card
@@ -321,8 +344,15 @@ function renderRecipeCard(recipe) {
     catContainer.appendChild(c);
   });
 
-  header.appendChild(title);
-  header.appendChild(catContainer);
+  const dateLabelText = formatRecipeDate(recipe.timestamp);
+  const dateLabel = document.createElement('div');
+  dateLabel.className = 'recipe-meta';
+  dateLabel.textContent = dateLabelText;
+
+  metaRow.appendChild(catContainer);
+  if (dateLabelText) metaRow.appendChild(dateLabel);
+
+  header.appendChild(metaRow);
 
   // Content collapsible
   const content = document.createElement('div');
