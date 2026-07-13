@@ -8,7 +8,28 @@ let allRecipes = [];
 let filteredRecipes = [];
 let activeCategories = new Set();
 let allCategories = [];
-let pinnedRecipes = new Set();
+let pinnedRecipes = loadPinnedRecipes();
+
+const PINNED_RECIPES_STORAGE_KEY = 'pinnedRecipes';
+
+function loadPinnedRecipes() {
+  try {
+    const stored = localStorage.getItem(PINNED_RECIPES_STORAGE_KEY);
+    if (!stored) return new Set();
+    const parsed = JSON.parse(stored);
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch (error) {
+    return new Set();
+  }
+}
+
+function savePinnedRecipes() {
+  try {
+    localStorage.setItem(PINNED_RECIPES_STORAGE_KEY, JSON.stringify([...pinnedRecipes]));
+  } catch (error) {
+    console.warn('Could not save pinned recipes:', error);
+  }
+}
 
 // Shuffle utility (Fisher-Yates)
 function shuffleArray(array) {
@@ -171,6 +192,7 @@ function renderRecipes(recipesToRender) {
       } else {
         pinnedRecipes.add(recipe.title);
       }
+      savePinnedRecipes();
       filterAndRender();
     };
     card.appendChild(pinBtn);

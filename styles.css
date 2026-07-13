@@ -105,14 +105,21 @@ h1 {
   color: #ffffff;
   user-select: none;
   font-size: clamp(0.8rem, 3vw, 0.9rem);
-  transition: background-color 0.25s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   border: 1px solid transparent;
+}
+
+.category-label:hover,
+.category-label:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(199,92,26,0.16);
 }
 
 .category-label.active {
   background: #c75c1a; 
   color: #fff;
   border-color: #a34713;
+  box-shadow: 0 2px 8px rgba(199,92,26,0.18);
 }
 
 #recipeList {
@@ -128,12 +135,39 @@ h1 {
   border: 1px solid #e1a948;
   padding: 1rem;
   cursor: pointer;
-  transition: box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative; /* Needed for absolute pin positioning */
+  animation: cardFadeIn 0.25s ease both;
 }
 
-.recipe-card:hover {
-  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+.recipe-card:hover,
+.recipe-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(199, 92, 26, 0.14);
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card,
+  .category-label,
+  .recipe-card:hover,
+  .recipe-card:focus-visible,
+  .category-label:hover,
+  .category-label:focus-visible {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
 }
 
 .recipe-header {
