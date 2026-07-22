@@ -1,6 +1,10 @@
 {
   "title": "Korma curry met lychees",
-  "category": [],
+  "category": [
+    "Aziatisch",
+    "Curry",
+    "Rijst"
+  ],
   "ingredients": [
     "1 tl kurkuma",
     "1 tl komijnpoeder",
@@ -26,5 +30,5 @@
     "",
     "Serveer met rijst, naan, cashews en verse koriander. "
   ],
-  "timestamp": "2026-07-21T19:29:20.196Z"
+  "timestamp": "2026-07-22T10:32:38.787Z"
 }
